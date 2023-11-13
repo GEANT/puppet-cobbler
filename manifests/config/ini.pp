@@ -31,22 +31,15 @@
 #
 # Anton Baranov <abaranov@linuxfoundation.org>
 define cobbler::config::ini (
-  $ensure,
-  $config_file,
-  $options
+  Enum['present', 'absent'] $ensure,
+  Stdlib::Absolutepath $config_file,
+  Hash $options
 ) {
-  validate_absolute_path($config_file)
-  validate_hash($options)
-  validate_re($ensure, ['^present', '^absent'])
-
-  File {
-    mode  => '0644',
-    owner => 'root',
-    group => 'root',
-  }
-
   file { $config_file:
     ensure  => $ensure,
-    content => template("${module_name}/ini.erb")
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => template("${module_name}/ini.erb"),
   }
 }

@@ -21,25 +21,9 @@
 #
 # Anton Baranov <abaranov@linuxfoundation.org>
 class cobbler::install (
-  $package,
-  $package_ensure,
-){
-  # Validation
-  validate_re($package_ensure,[
-    '^present$',
-    '^installed$',
-    '^absent$',
-    '^purged$',
-    '^held$',
-    '^latest$',
-  ])
-
-  if is_array($package) {
-    validate_array($package)
-  } else {
-    validate_string($package)
-  }
-
+  Variant[String, Array] $package,
+  Enum['present', 'installed', 'absent', 'purged', 'held', 'latest'] $package_ensure,
+) {
   package { $package:
     ensure => $package_ensure,
   }

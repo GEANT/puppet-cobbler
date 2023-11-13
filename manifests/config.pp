@@ -62,53 +62,33 @@
 # === Authors
 #
 # Anton Baranov <abaranov@linuxfoundation.org>
-class cobbler::config(
-  $ensure,
-  $cobbler_config,
-  $cobbler_modules_config,
-  $config_path,
-  $config_file,
-  $config_modules,
-){
-  # Validation
-  validate_absolute_path(
-    $config_path,
-  )
-  validate_hash(
-    $cobbler_config,
-    $cobbler_modules_config,
-  )
-  validate_re($ensure, ['^present$','^absent$'])
-
-  validate_string(
-    $config_file,
-    $config_modules
-  )
-
-
-  File {
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
-  }
-
+class cobbler::config (
+  Enum['present', 'absent'] $ensure,
+  Hash $cobbler_config,
+  Hash $cobbler_modules_config,
+  Stdlib::Absolutepath $config_path,
+  String $config_file,
+  String $config_modules,
+) {
   $_dir_ensure = $ensure ? {
     'present' => 'directory',
     default   => 'absent',
   }
-  file {$config_path:
-    ensure => $_dir_ensure,
-  }
-  # Just convert to yaml
-  file {"${config_path}/${config_file}":
-    ensure  => $ensure,
-    content => template ('cobbler/yaml.erb')
+  file {
+    default:
+      owner => 'root',
+      group => 'root',
+      mode  => '0644';
+    $config_path:
+      ensure => $_dir_ensure;
+    "${config_path}/${config_file}":
+      ensure  => $ensure,
+      content => template ('cobbler/yaml.erb');
   }
 
-  cobbler::config::ini {'modules.conf':
+  cobbler::config::ini { 'modules.conf':
     ensure      => $ensure,
     config_file => "${config_path}/${config_modules}",
     options     => $cobbler_modules_config,
   }
-
 }
