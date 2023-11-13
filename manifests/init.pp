@@ -116,7 +116,6 @@ class cobbler (
   Hash $cobbler_modules_config               = {},
   Enum['present', 'absent'] $ensure          = $cobbler::params::ensure,
   Variant[String, Array] $package            = $cobbler::params::package,
-  $package_ensure                            = $cobbler::params::package_ensure,
   String $service                            = $cobbler::params::service,
   Enum['stopped', 'running'] $service_ensure = $cobbler::params::service_ensure,
   Stdlib::Absolutepath $config_path          = $cobbler::params::config_path,
@@ -124,12 +123,15 @@ class cobbler (
   String $config_modules                     = $cobbler::params::config_modules,
   Hash $default_cobbler_config               = $cobbler::params::default_cobbler_config,
   Hash $default_modules_config               = $cobbler::params::default_modules_config,
+  Enum[
+    'present', 'installed', 'absent', 'purged', 'held', 'latest'
+  ] $package_ensure                          = $cobbler::params::package_ensure,
   Variant[
     Boolean, Enum['present', 'absent', 'purged', 'latest', 'installed', 'held']
   ] $service_enable                          = $cobbler::params::service_enable,
 ) inherits cobbler::params {
-  anchor { 'cobbler::begin': }
-  anchor { 'cobbler::end': }
+  anchor { 'cobbler::begin': } #lint:ignore:anchor_resource
+  anchor { 'cobbler::end': } #lint:ignore:anchor_resource
 
   class { 'cobbler::install':
     package        => $package,

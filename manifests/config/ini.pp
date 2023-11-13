@@ -4,6 +4,9 @@
 #
 # === Parameters
 #
+# [*ensure*]
+#   Ensure that the config file is present or absent
+#
 # [*config_file*]
 #   Absolute path to configuration file
 #
