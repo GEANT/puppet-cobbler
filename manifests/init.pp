@@ -112,21 +112,23 @@
 #
 # Anton Baranov <abaranov@linuxfoundation.org>
 class cobbler (
-  Hash $cobbler_config         = {},
-  Hash $cobbler_modules_config = {},
-  Enum['present', 'absent'] $ensure = $cobbler::params::ensure,
-  Variant[String, Array] $package                = $cobbler::params::package,
-  $package_ensure         = $cobbler::params::package_ensure,
-  Hash $service                = $cobbler::params::service,
-  Enum['stopped', 'running'] $service_ensure = $cobbler::params::service_ensure,
+  Hash $cobbler_config                       = {},
+  Hash $cobbler_modules_config               = {},
+  Enum['present', 'absent'] $ensure          = $cobbler::params::ensure,
+  Variant[String, Array] $package            = $cobbler::params::package,
+  $package_ensure                            = $cobbler::params::package_ensure,
+  String $service                            = $cobbler::params::service,
+  Variant[
+    Boolean, Enum['stopped', 'running']
+  ] $service_ensure = $cobbler::params::service_ensure,
+  Stdlib::Absolutepath $config_path          = $cobbler::params::config_path,
+  Hash $config_file                          = $cobbler::params::config_file,
+  Hash $config_modules                       = $cobbler::params::config_modules,
+  Hash $default_cobbler_config               = $cobbler::params::default_cobbler_config,
+  Hash $default_modules_config               = $cobbler::params::default_modules_config,
   Enum[
     'present', 'absent', 'purged', 'latest', 'installed', 'held'
-  ] $service_enable = $cobbler::params::service_enable,
-  Stdlib::Absolutepath $config_path = $cobbler::params::config_path,
-  Hash $config_file            = $cobbler::params::config_file,
-  Hash $config_modules         = $cobbler::params::config_modules,
-  Hash $default_cobbler_config = $cobbler::params::default_cobbler_config,
-  Hash $default_modules_config = $cobbler::params::default_modules_config,
+  ] $service_enable                          = $cobbler::params::service_enable,
 ) inherits cobbler::params {
   anchor { 'cobbler::begin': }
   anchor { 'cobbler::end': }
