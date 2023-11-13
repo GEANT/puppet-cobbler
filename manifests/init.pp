@@ -112,65 +112,26 @@
 #
 # Anton Baranov <abaranov@linuxfoundation.org>
 class cobbler (
-  $cobbler_config         = {},
-  $cobbler_modules_config = {},
-  $ensure                 = $::cobbler::params::ensure,
-  $package                = $::cobbler::params::package,
-  $package_ensure         = $::cobbler::params::package_ensure,
-  $service                = $::cobbler::params::service,
-  $service_ensure         = $::cobbler::params::service_ensure,
-  $service_enable         = $::cobbler::params::service_enable,
-  $config_path            = $::cobbler::params::config_path,
-  $config_file            = $::cobbler::params::config_file,
-  $config_modules         = $::cobbler::params::config_modules,
-  $default_cobbler_config = $::cobbler::params::default_cobbler_config,
-  $default_modules_config = $::cobbler::params::default_modules_config,
-) inherits ::cobbler::params {
+  Hash $cobbler_config         = {},
+  Hash $cobbler_modules_config = {},
+  Enum['present', 'absent'] $ensure = $cobbler::params::ensure,
+  Variant[String, Array] $package                = $cobbler::params::package,
+  $package_ensure         = $cobbler::params::package_ensure,
+  Hash $service                = $cobbler::params::service,
+  Enum['stopped', 'running'] $service_ensure = $cobbler::params::service_ensure,
+  Enum[
+    'present', 'absent', 'purged', 'latest', 'installed', 'held'
+  ] $service_enable = $cobbler::params::service_enable,
+  Stdlib::Absolutepath $config_path = $cobbler::params::config_path,
+  Hash $config_file            = $cobbler::params::config_file,
+  Hash $config_modules         = $cobbler::params::config_modules,
+  Hash $default_cobbler_config = $cobbler::params::default_cobbler_config,
+  Hash $default_modules_config = $cobbler::params::default_modules_config,
+) inherits cobbler::params {
+  anchor { 'cobbler::begin': }
+  anchor { 'cobbler::end': }
 
-  # Validation
-  validate_re($ensure, ['^present$','^absent$'])
-  validate_re($service_ensure,['^stopped$', '^running$'])
-  validate_re($package_ensure,[
-    '^present$',
-    '^installed$',
-    '^absent$',
-    '^purged$',
-    '^held$',
-    '^latest$',
-  ])
-  validate_string(
-    $service,
-    $config_file,
-    $config_modules
-  )
-  validate_absolute_path(
-    $config_path,
-  )
-  validate_hash(
-    $default_cobbler_config,
-    $cobbler_config,
-    $cobbler_modules_config,
-  )
-
-  if is_string($service_enable) {
-    validate_re($service_enable, [
-      '^manual$',
-      '^mask$'
-    ])
-  } else {
-    validate_bool($service_enable)
-  }
-
-  if is_array($package) {
-    validate_array($package)
-  } else {
-    validate_string($package)
-  }
-
-  anchor{'cobbler::begin':}
-  anchor{'cobbler::end':}
-
-  class{'cobbler::install':
+  class { 'cobbler::install':
     package        => $package,
     package_ensure => $package_ensure,
   }
@@ -186,7 +147,7 @@ class cobbler (
     $cobbler_modules_config
   )
 
-  class{'cobbler::config':
+  class { 'cobbler::config':
     ensure                 => $ensure,
     cobbler_config         => $_cobbler_config,
     cobbler_modules_config => $_cobbler_modules_config,
@@ -195,7 +156,7 @@ class cobbler (
     config_modules         => $config_modules,
   }
 
-  class{'cobbler::service':
+  class { 'cobbler::service':
     service        => $service,
     service_ensure => $service_ensure,
     service_enable => $service_enable,
